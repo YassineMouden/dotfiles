@@ -31,9 +31,9 @@ Manager](https://github.com/tmux-plugins/tpm).
     set -g @plugin 'tmux-plugins/tmux-yank'
     ```
 
-2.  Use <kbd>prefix</kbd>–<kbd>I</kbd> install `tmux-yank`. You should now
+2.  Use <kbd>prefix</kbd>-<kbd>I</kbd> install `tmux-yank`. You should now
     be able to `tmux-yank` immediately.
-3.  When you want to update `tmux-yank` use <kbd>prefix</kbd>–<kbd>U</kbd>.
+3.  When you want to update `tmux-yank` use <kbd>prefix</kbd>-<kbd>U</kbd>.
 
 ### Manual Installation
 
@@ -71,11 +71,11 @@ the system clipboard.
 **Note**: Some versions of macOS (aka OS X) have been reported to work
 without `reattach-to-user-namespace`. It doesn't hurt to have it installed.
 
--   OS X 10.8: Mountain Lion – *required*
--   OS X 10.9: Mavericks – *required*
--   OS X 10.10: Yosemite – *not required*
--   OS X 10.11: El Capitan – *not required*
--   macOS 10.12: Sierra – *required*
+-   OS X 10.8: Mountain Lion - *required*
+-   OS X 10.9: Mavericks - *required*
+-   OS X 10.10: Yosemite - *not required*
+-   OS X 10.11: El Capitan - *not required*
+-   macOS 10.12: Sierra - *required*
 -   macOS 10.14: Mojave - *required*
 -   macOS 10.15: Catalina - *not required*
 
@@ -153,7 +153,7 @@ Configuration
 ### Key bindings
 
 -   Normal Mode
-    -   <kbd>prefix</kbd>–<kbd>y</kbd> — copies text from the command line
+    -   <kbd>prefix</kbd>-<kbd>y</kbd> - copies text from the command line
         to the clipboard.
 
         Works with all popular shells/repls. Tested with:
@@ -166,12 +166,12 @@ Configuration
             [vim-husk](https://github.com/bruno-/vim-husk) or
             [vim-rsi](https://github.com/tpope/vim-rsi) plugin)
 
-    -   <kbd>prefix</kbd>–<kbd>Y</kbd> — copy the current pane's current
+    -   <kbd>prefix</kbd>-<kbd>Y</kbd> - copy the current pane's current
         working directory to the clipboard.
 
 -   Copy Mode
-    -   <kbd>y</kbd> — copy selection to system clipboard.
-    -   <kbd>Y</kbd> (shift-y) — "put" selection. Equivalent to copying a
+    -   <kbd>y</kbd> - copy selection to system clipboard.
+    -   <kbd>Y</kbd> (shift-y) - "put" selection. Equivalent to copying a
         selection, and pasting it to the command line.
 
 
@@ -273,7 +273,7 @@ This isn't needed with `tmux` 2.4 or newer.
 [![screencast
 screenshot](/video/screencast_img.png)](https://vimeo.com/102039099)
 
-**Note**: The screen-cast uses <kbd>Control</kbd>–<kbd>y</kbd> for
+**Note**: The screen-cast uses <kbd>Control</kbd>-<kbd>y</kbd> for
 "put selection". Use <kbd>Y</kbd> in `v2.0.0` and later.
 
 ### Other tmux plugins

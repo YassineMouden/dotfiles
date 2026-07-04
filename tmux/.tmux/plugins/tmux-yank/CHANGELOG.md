@@ -44,7 +44,7 @@ Change Log
 ### Updated
 
 -   Make `reattach-to-user-namespace` on OS X optional (@bosr)
--   Deprecate <kbd>Alt</kbd>–<kbd>y</kbd>
+-   Deprecate <kbd>Alt</kbd>-<kbd>y</kbd>
 
 [v2.0.0] 2014-12-06
 -------------------
@@ -52,7 +52,7 @@ Change Log
 ### Fixed
 
 -   Change copy mode "put selection" key binding to <kbd>Y</kbd> so that vi
-    mode <kbd>Control</kbd>–<kbd>y</kbd> is not overridden.
+    mode <kbd>Control</kbd>-<kbd>y</kbd> is not overridden.
 
 [v1.0.0] 2014-12-06
 -------------------

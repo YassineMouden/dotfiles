@@ -117,7 +117,7 @@ export PATH="$PATH:/Users/jasinm/.local/bin"
 
 # Added by Windsurf
 export PATH="/Users/jasinm/.codeium/windsurf/bin:$PATH"
-neofetch
+fastfetch
 export PATH="/usr/local/opt/libxml2/bin:$PATH"
 
 # bun completions
