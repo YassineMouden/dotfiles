@@ -8,8 +8,9 @@
       user-mail-address "jasinpr9915@gmail.com")
 
 (setq doom-font (font-spec :family "Fira Code" :size 15)
-      doom-variable-pitch-font (font-spec :family "Fira Code" :size 18)
-      doom-big-font (font-spec :family "Fira Code" :size 22))
+      doom-variable-pitch-font (font-spec :family "JuliaMono" :size 18)
+      doom-symbol-font (font-spec :family "JuliaMono")
+      doom-big-font (font-spec :family "JuliaMono" :size 22))
 
 (setq doom-theme 'doom-gruvbox)
 (setq display-line-numbers-type 'relative)
@@ -30,9 +31,9 @@
 (defvar daily-dir (concat org-directory "daily/"))
 
 (dolist (dir (list soul-dir mind-dir roam-dir daily-dir
-                    (concat roam-dir "main/")
-                    (concat roam-dir "code/")
-                    (concat roam-dir "reference/")))
+                   (concat roam-dir "main/")
+                   (concat roam-dir "code/")
+                   (concat roam-dir "reference/")))
   (unless (file-exists-p dir)
     (make-directory dir t)))
 
@@ -65,7 +66,7 @@
   (add-to-list 'org-modules 'org-habit)
 
   (setq org-habit-show-habits t
-        org-habit-show-habits-only-for-today nil
+        org-habit-show-habits-only-for-today t 
         org-habit-show-all-today t
         org-habit-show-done-always-green t
         org-habit-graph-column 50
@@ -76,6 +77,7 @@
   (setq org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "ACTIVE(a)" "WAITING(w)" "|" "DONE(d!)" "CANCELLED(c)")
           (sequence "HABIT(h)" "|" "DONE(d!)")))
+
 
   (setq org-todo-keyword-faces
         '(("TODO" . (:foreground "#fb4934" :weight bold))
@@ -168,7 +170,7 @@
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
            :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                               "#+title: ${title}\n#+date: %U\n\n")
+                              "#+title: ${title}\n#+date: %U\n\n")
            :unnarrowed t))))
 
 ;; ============================================================================
@@ -196,7 +198,7 @@
 (defun my/org-sync--in-repo-p (file)
   (and file
        (string-prefix-p (expand-file-name my/org-sync-repo-dir)
-                         (expand-file-name file))))
+                        (expand-file-name file))))
 
 (defun my/org-sync-commit-and-push ()
   "Commit any changes in the notes repo and push to GitHub."
@@ -222,7 +224,7 @@
     (when my/org-sync-timer (cancel-timer my/org-sync-timer))
     (setq my/org-sync-timer
           (run-with-idle-timer my/org-sync-idle-delay nil
-                                #'my/org-sync-commit-and-push))))
+                               #'my/org-sync-commit-and-push))))
 
 (add-hook 'after-save-hook #'my/org-sync-schedule)
 
@@ -277,3 +279,7 @@
   (setq x-no-window-manager t
         frame-inhibit-implied-resize t
         focus-follows-mouse nil))
+
+;;---------
+(require 'zen-mode)
+(global-set-key (kbd "C-M-z") 'zen-mode)
