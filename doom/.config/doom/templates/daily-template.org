@@ -1,0 +1,64 @@
+#+title: Daily Plan - %<%Y-%m-%d %A>
+#+date: %U
+#+filetags: :daily:
+
+* Yesterday Review
+Did I complete yesterday's highlight? [ ] Y / [ ] N
+If not, why?
+
+* Daily Highlight
+
+* Today Tasks
+
+
+
+* Morning Habits
+- [ ] Wake on time 
+- [ ] Meditate 
+- [ ] Stretch    
+- [ ] Healthy breakfast
+- [ ] Review daily plan
+
+* Evening Habits
+- [ ] Journal entry
+- [ ] Reviewed today's notes
+- [ ] Plane tomorrow
+- [ ] 1hr read
+- [ ] sleep on time
+
+* Journal
+:PROPERTIES:
+:CREATED: %U
+:WORD_COUNT: 0
+:END:
+
+[Write your thoughts, reflections, gratitude, dreams, insights...]
+
+
+*  Evening Review
+** What I Accomplished Today
+1.
+2.
+3.
+
+** What Went Well
+-
+
+** What Could Be Better
+-
+
+** Tomorrow's Priority
+
+** Gratitude
+1.
+2.
+3.
+
+
+* If I died today, would I be proud of how I spent it?
+ - [ ] Yes 
+ - [ ] No 
+   
+** Why?
+
+
