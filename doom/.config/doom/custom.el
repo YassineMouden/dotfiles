@@ -17,7 +17,10 @@
      "8c7e832be864674c220f9a9361c851917a93f921fedb7717b1b5ece47690c098"
      "aec7b55f2a13307a55517fdf08438863d694550565dee23181d2ebd973ebd6b8"
      "dd4582661a1c6b865a33b89312c97a13a3885dc95992e2e5fc57456b4c545176"
-     "f1e8339b04aef8f145dd4782d03499d9d716fdc0361319411ac2efc603249326" default)))
+     "f1e8339b04aef8f145dd4782d03499d9d716fdc0361319411ac2efc603249326" default))
+ '(package-selected-packages
+   '(fira-code-mode indent-guide ligature neotree smooth-scroll treemacs
+     treemacs-nerd-icons zen-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

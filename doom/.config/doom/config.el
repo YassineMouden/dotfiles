@@ -1,9 +1,5 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; ============================================================================
-;; IDENTITY & APPEARANCE
-;; ============================================================================
-
 (setq user-full-name "Yacin"
       user-mail-address "jasinpr9915@gmail.com")
 
@@ -15,15 +11,21 @@
 (setq doom-theme 'doom-gruvbox)
 (setq display-line-numbers-type 'relative)
 
+(custom-set-faces!
+  '(outline-2 :foreground "#fe8019")
+  '(outline-4 :foreground "#fabd2f")
+  '(outline-3 :foreground "#b8bb26")
+  '(outline-1 :foreground "#fb4934")
+  '(font-lock-constant-face :foreground "#fe8019")
+  '(highlight-numbers-number-face :foreground "#fabd2f")
+  '(link :foreground "#fabd2f")
+  '(org-link :foreground "#fabd2f")
+  '(rainbow-delimiters-depth-2-face :foreground "#b8bb26"))
+
 (when (display-graphic-p)
   (set-frame-parameter (selected-frame) 'alpha '(75. 75))
   (add-to-list 'default-frame-alist '(alpha . (70. 70))))
 
-;; ============================================================================
-;; CORE PATHS — "The Workshop"
-;; ============================================================================
-;; Capture -> Learn -> Build -> Write -> Publish.
-;; See ~/.config/doom/README.md for the full philosophy this mirrors.
 
 (setq org-directory "~/life/")
 
@@ -47,13 +49,6 @@
 (defvar wishlist-file  (concat org-directory "wishlist.org"))
 (defvar bookmarks-file (concat library-dir "bookmarks.org"))
 
-;; ============================================================================
-;; TEMPLATE HELPERS
-;; ============================================================================
-;; Small hand-rolled %%KEY%% renderer instead of leaning on org-capture's
-;; escape engine, since these files (today's note, new drafts, new knowledge
-;; notes...) are often created outside of an actual capture flow. Deliberately
-;; plain string substitution — no magic, easy to read top to bottom.
 
 (defun my/--slugify (s)
   "Turn S into a lowercase, hyphenated, filename-safe slug."
@@ -70,13 +65,22 @@
                         (directory-files dir t "\\`[^.]")))))
 
 (defun my/--render-template (template-file replacements)
-  "Return TEMPLATE-FILE's contents with %%KEY%% swapped per REPLACEMENTS alist."
+  "Return TEMPLATE-FILE's contents with %%KEY%% swapped per REPLACEMENTS alist.
+Also expands org-style %<FORMAT> time escapes and bare %U, so a template
+written with the old org-capture-escape style still renders correctly
+instead of leaving literal escape text in the file."
   (with-temp-buffer
     (insert-file-contents template-file)
     (dolist (pair replacements)
       (goto-char (point-min))
       (while (search-forward (format "%%%%%s%%%%" (car pair)) nil t)
         (replace-match (cdr pair) t t)))
+    (goto-char (point-min))
+    (while (re-search-forward "%<\\([^>]+\\)>" nil t)
+      (replace-match (format-time-string (match-string 1)) t t))
+    (goto-char (point-min))
+    (while (re-search-forward "%U" nil t)
+      (replace-match (format-time-string "[%Y-%m-%d %a %H:%M]") t t))
     (buffer-string)))
 
 (defun my/--new-file-from-template (template-file target-file replacements)
@@ -94,9 +98,6 @@
     (with-temp-file file
       (insert (format "#+title: %s\n\n" title)))))
 
-;; ============================================================================
-;; SCAFFOLD THE WORKSHOP ON FIRST RUN
-;; ============================================================================
 
 (dolist (dir (list inbox-dir today-dir projects-dir knowledge-dir
                    writing-dir drafts-dir journal-dir
@@ -105,9 +106,6 @@
   (unless (file-exists-p dir)
     (make-directory dir t)))
 
-;; Starter subfolders — matches the layout already in use (website, homelab,
-;; dotfiles homelab work; linux/emacs/networking/programming coursework).
-;; Add more with `SPC n p n' / `SPC n k n' as they come up.
 (dolist (proj '("website" "homelab" "dotfiles" "university" "thinkpad"))
   (make-directory (concat projects-dir proj "/") t))
 
@@ -121,15 +119,8 @@
 (my/--ensure-file wishlist-file "Wishlist")
 (my/--ensure-file bookmarks-file "Bookmarks")
 
-;; ============================================================================
-;; ORG-MODE: BASE CONFIGURATION
-;; ============================================================================
 
 (after! org
-  ;; Agenda pulls from the two permanent lists plus every daily note.
-  ;; Project-scoped todo.org files stay out of the agenda on purpose — they're
-  ;; backlog/planning, not necessarily dated. They're still reachable via
-  ;; refile (see below) and `SPC n p p'.
   (setq org-agenda-files
         (append (list tasks-file habits-file)
                 (directory-files today-dir t "\\.org$" nil)))
@@ -147,7 +138,6 @@
 
   (global-visual-line-mode t)
 
-  ;; --- Habit tracking ---
   (require 'org-habit)
   (add-to-list 'org-modules 'org-habit)
 
@@ -160,7 +150,6 @@
         org-habit-following-days 7)
 
 
-  ;; --- TODO keywords ---
   (setq org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "ACTIVE(a)" "WAITING(w)" "|" "DONE(d!)" "CANCELLED(c)")
           (sequence "HABIT(h)" "|" "DONE(d!)")))
@@ -173,7 +162,6 @@
           ("HABIT" . (:foreground "#83a598" :weight bold))
           ("DONE" . (:foreground "#689d6a" :weight bold))))
 
-  ;; --- Capture templates ---
   (setq org-capture-templates
         `(("i" "Inbox" entry
            (file ,inbox-file)
@@ -195,7 +183,6 @@
            "* %?\n%U\n"
            :empty-lines 1)))
 
-  ;; --- Refile ---
   (defun my/project-todo-files ()
     "Return every existing projects/*/todo.org path."
     (when (file-directory-p projects-dir)
@@ -215,13 +202,11 @@
         org-outline-path-complete-in-steps nil
         org-refile-allow-creating-parent-nodes 'confirm)
 
-  ;; --- Agenda ---
   (setq org-agenda-span 'day
         org-agenda-start-on-weekday nil
         org-agenda-skip-scheduled-if-done t
         org-agenda-skip-deadline-if-done t)
 
-  ;; Two views: plain todo list, and habit heatmap
   (setq org-agenda-custom-commands
         '(("t" "My TODOs"
            ((todo "NEXT")
@@ -233,13 +218,10 @@
            ((agenda ""
                     ((org-agenda-span 'month)
                      (org-agenda-overriding-header "\nHabit Heatmap\n")
-                     ))))))
+                     (org-habit-show-habits-only-for-today nil)))))))
 
   (setq org-archive-location (concat archive-dir "%s_archive::")))
 
-;; ============================================================================
-;; ORG-ROAM  (backs knowledge/)
-;; ============================================================================
 
 (use-package! org-roam
   :after org
@@ -251,18 +233,12 @@
   (setq org-roam-node-display-template
         (concat "${title:*} " (propertize "${tags:30}" 'face 'org-tag)))
 
-  ;; Quick capture (SPC n f on a new title) lands a flat node at the root of
-  ;; knowledge/. For a note filed under a specific topic folder (knowledge/linux/,
-  ;; knowledge/emacs/...), use `SPC n k n' instead — see below.
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
            :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                               "#+title: ${title}\n#+date: %U\n\n* What is it?\n\n* Advantages\n\n* Commands / Usage\n\n* References\n\n")
            :unnarrowed t))))
 
-;; ============================================================================
-;; ROAM UI, IMAGE DROP, POMODORO
-;; ============================================================================
 
 (use-package! org-roam-ui
   :after org-roam
@@ -280,29 +256,21 @@
         org-download-heading-lvl nil
         org-download-timestamp "%Y%m%d-%H%M%S-"))
 
-(use-package! org-pomodoro
-  :after org
-  :config
-  (setq org-pomodoro-length 25
-        org-pomodoro-short-break-length 5
-        org-pomodoro-long-break-length 15))
-
-;; ============================================================================
-;; TODAY'S NOTE
-;; ============================================================================
 
 (defun my/open-today ()
   "Open (or create) today's note under today/."
   (interactive)
-  (my/--new-file-from-template
-   (concat templates-dir "today-template.org")
-   (concat today-dir (format-time-string "%Y-%m-%d.org"))
-   `(("DATE" . ,(format-time-string "%Y-%m-%d"))
-     ("WEEKDAY" . ,(format-time-string "%A")))))
+  (let ((template (cond ((file-exists-p (concat templates-dir "today-template.org"))
+                         (concat templates-dir "today-template.org"))
+                        ((file-exists-p (concat templates-dir "daily-template.org"))
+                         (concat templates-dir "daily-template.org"))
+                        (t (concat templates-dir "today-template.org")))))
+    (my/--new-file-from-template
+     template
+     (concat today-dir (format-time-string "%Y-%m-%d.org"))
+     `(("DATE" . ,(format-time-string "%Y-%m-%d"))
+       ("WEEKDAY" . ,(format-time-string "%A"))))))
 
-;; ============================================================================
-;; PROJECTS
-;; ============================================================================
 
 (defun my/open-project ()
   "Pick a project under projects/ and open it in Dired."
@@ -327,9 +295,6 @@
          ("DATE" . ,(format-time-string "%Y-%m-%d")))))
     (dired dir)))
 
-;; ============================================================================
-;; WRITING  (drafts -> ox-hugo -> website)
-;; ============================================================================
 
 (defun my/new-draft (title)
   "Create a new writing/drafts/<slug>.org."
@@ -339,15 +304,9 @@
    (concat drafts-dir (my/--slugify title) ".org")
    `(("TITLE" . ,title) ("DATE" . ,(format-time-string "%Y-%m-%d")))))
 
-;; The website itself lives at projects/website/ (a real Hugo repo checkout).
-;; `SPC n w p' runs ox-hugo's standard per-file/subtree export; running `hugo`
-;; itself (build/deploy) stays a shell/CI concern outside Emacs.
 (after! ox-hugo
   (setq org-hugo-base-dir (concat projects-dir "website")))
 
-;; ============================================================================
-;; KNOWLEDGE  (knowledge/<topic>/, doubles as org-roam nodes)
-;; ============================================================================
 
 (defun my/new-knowledge-note (topic title)
   "Create a new knowledge/<topic>/<slug>.org. Picked up by org-roam automatically."
@@ -359,9 +318,6 @@
    (concat knowledge-dir (file-name-as-directory topic) (my/--slugify title) ".org")
    `(("TITLE" . ,title) ("DATE" . ,(format-time-string "%Y-%m-%d")))))
 
-;; ============================================================================
-;; LIBRARY  (books/, articles/)
-;; ============================================================================
 
 (defun my/new-book-note (title)
   "Create a new library/books/<slug>.org."
@@ -379,9 +335,6 @@
    (concat articles-dir (my/--slugify title) ".org")
    `(("TITLE" . ,title) ("DATE" . ,(format-time-string "%Y-%m-%d")))))
 
-;; ============================================================================
-;; GIT AUTO-SYNC (commit + push on idle, pull on focus/startup)
-;; ============================================================================
 
 (defvar my/org-sync-repo-dir org-directory)
 (defvar my/org-sync-timer nil)
@@ -420,6 +373,22 @@
 
 (add-hook 'after-save-hook #'my/org-sync-schedule)
 
+(defun my/org-sync-commit-and-push-on-exit ()
+  "Synchronously commit and push any pending changes before Emacs exits."
+  (when my/org-sync-timer
+    (cancel-timer my/org-sync-timer))
+  (let ((default-directory my/org-sync-repo-dir))
+    (when (executable-find "git")
+      (unless (zerop (call-process "git" nil nil nil "diff" "--quiet" "--exit-code"))
+        (call-process "git" nil nil nil "add" "-A")
+        (call-process "git" nil nil nil "commit" "-m"
+                      (format-time-string "auto: %Y-%m-%d %H:%M:%S")))
+
+      (with-timeout (5 (message "org-sync: push timed out on exit"))
+        (call-process "git" nil nil nil "push")))))
+
+(add-hook 'kill-emacs-hook #'my/org-sync-commit-and-push-on-exit)
+
 (defun my/org-sync-pull ()
   "Pull latest notes from the remote."
   (let ((default-directory my/org-sync-repo-dir))
@@ -432,9 +401,6 @@
             (my/org-sync-pull)
             (my/open-today)))
 
-;; ============================================================================
-;; KEYBINDINGS
-;; ============================================================================
 
 (map! :leader
       (:prefix ("n" . "notes")
@@ -446,10 +412,6 @@
        :desc "Toggle backlinks"      "l" #'org-roam-buffer-toggle
        :desc "Roam UI graph"         "u" #'org-roam-ui-open
 
-       ;; NOTE: these live under SPC n rather than top-level SPC p / SPC w —
-       ;; those are Doom's built-in projectile and window-management prefixes,
-       ;; and reusing them here would silently override bindings you already
-       ;; rely on (SPC p p = projectile-switch-project, SPC w = window map).
        (:prefix ("p" . "projects")
         :desc "Open a project" "p" #'my/open-project
         :desc "New project"    "n" #'my/new-project)
@@ -470,7 +432,7 @@
        :desc "Refile"        "r" #'org-refile
        :desc "My TODOs"      "t" (lambda () (interactive) (org-agenda nil "t"))
        :desc "Habit heatmap" "h" (lambda () (interactive) (org-agenda nil "h"))
-       :desc "Pomodoro"      "p" #'org-pomodoro))
+       ))
 
 (map! :g "C-c c" #'org-capture)
 
@@ -480,13 +442,11 @@
       "M-k" #'evil-window-up
       "M-j" #'evil-window-down)
 
-;; Evil-mode
 (setq evil-escape-key-sequence "kj"
       evil-escape-delay 0.1
       evil-move-cursor-back nil
       evil-want-fine-undo t)
 
-;; Auto-save & macOS
 (setq auto-save-default t
       delete-by-moving-to-trash t)
 
